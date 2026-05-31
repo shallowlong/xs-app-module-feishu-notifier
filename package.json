@@ -1,11 +1,15 @@
 {
 	"name": "xs.app.module.feishu-notifier",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "飞书消息通知模块，支持频率控制、消息队列和失败重试",
 	"type": "module",
 	"main": "./src/index.js",
+	"types": "./src/index.d.ts",
 	"exports": {
-		".": "./src/index.js"
+		".": {
+			"import": "./src/index.js",
+			"types": "./src/index.d.ts"
+		}
 	},
 	"scripts": {
 		"test": "node --test"
