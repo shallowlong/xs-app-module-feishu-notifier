@@ -11,62 +11,62 @@ npm install feishu-notifier
 ## 快速开始
 
 ```javascript
-import FeishuNotifier from 'feishu-notifier';
+import FeishuNotifier from "feishu-notifier";
 
 // 创建通知器实例
 const notifier = new FeishuNotifier({
-  webhookUrl: 'https://open.feishu.cn/open-apis/bot/v2/hook/xxx'
+	webhookUrl: "https://open.feishu.cn/open-apis/bot/v2/hook/xxx",
 });
 
 // 发送通知
-await notifier.notify('系统启动成功');
+await notifier.notify("系统启动成功");
 
 // 发送警告
-await notifier.warn('磁盘空间不足！');
+await notifier.warn("磁盘空间不足！");
 ```
 
 ## 配置选项
 
-| 参数 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| `webhookUrl` | string | 是 | - | 飞书机器人 webhook 地址 |
-| `logger` | Object | 否 | `console` | 日志实例，需实现 `info`/`warn`/`error` 方法 |
-| `appName` | string | 否 | `''` | 应用名称，显示在消息前缀 |
-| `rateLimitPerSecond` | number | 否 | `2` | 每秒最大请求数 |
-| `rateLimitPerMinute` | number | 否 | `50` | 每分钟最大请求数 |
-| `maxQueueSize` | number | 否 | `100` | 消息队列最大长度 |
-| `maxMessageSize` | number | 否 | `20479` | 单条消息最大字节数（20KB-1） |
-| `skipPeakTime` | boolean | 否 | `false` | 是否跳过整点半点发送 |
-| `retryInterval` | number | 否 | `5000` | 发送失败重试间隔（毫秒） |
+| 参数                 | 类型    | 必填 | 默认值    | 说明                                        |
+| -------------------- | ------- | ---- | --------- | ------------------------------------------- |
+| `webhookUrl`         | string  | 是   | -         | 飞书机器人 webhook 地址                     |
+| `logger`             | Object  | 否   | `console` | 日志实例，需实现 `info`/`warn`/`error` 方法 |
+| `appName`            | string  | 否   | `''`      | 应用名称，显示在消息前缀                    |
+| `rateLimitPerSecond` | number  | 否   | `2`       | 每秒最大请求数                              |
+| `rateLimitPerMinute` | number  | 否   | `50`      | 每分钟最大请求数                            |
+| `maxQueueSize`       | number  | 否   | `100`     | 消息队列最大长度                            |
+| `maxMessageSize`     | number  | 否   | `20479`   | 单条消息最大字节数（20KB-1）                |
+| `skipPeakTime`       | boolean | 否   | `false`   | 是否跳过整点半点发送                        |
+| `retryInterval`      | number  | 否   | `5000`    | 发送失败重试间隔（毫秒）                    |
 
 ## 完整示例
 
 ```javascript
-import FeishuNotifier from 'feishu-notifier';
-import pino from 'pino';
+import FeishuNotifier from "feishu-notifier";
+import pino from "pino";
 
 const logger = pino();
 
 const notifier = new FeishuNotifier({
-  webhookUrl: process.env.FEISHU_WEBHOOK_URL,
-  logger: logger,
-  appName: 'my-app',
-  rateLimitPerSecond: 2,
-  rateLimitPerMinute: 50,
-  maxQueueSize: 100,
-  skipPeakTime: true,
-  retryInterval: 5000
+	webhookUrl: process.env.FEISHU_WEBHOOK_URL,
+	logger: logger,
+	appName: "my-app",
+	rateLimitPerSecond: 2,
+	rateLimitPerMinute: 50,
+	maxQueueSize: 100,
+	skipPeakTime: true,
+	retryInterval: 5000,
 });
 
 // 发送普通通知
-await notifier.notify('这是一条普通通知');
+await notifier.notify("这是一条普通通知");
 
 // 发送警告（会 @所有人）
-await notifier.warn('这是一条警告消息');
+await notifier.warn("这是一条警告消息");
 
 // 使用通用 send 方法
-await notifier.send('自定义消息', 'info');
-await notifier.send('自定义警告', 'warning');
+await notifier.send("自定义消息", "info");
+await notifier.send("自定义警告", "warning");
 ```
 
 ## 高级用法
@@ -74,17 +74,17 @@ await notifier.send('自定义警告', 'warning');
 ### 自定义 Logger
 
 ```javascript
-import FeishuNotifier from 'feishu-notifier';
+import FeishuNotifier from "feishu-notifier";
 
 const customLogger = {
-  info: (msg) => console.log(`[INFO] ${msg}`),
-  warn: (msg) => console.log(`[WARN] ${msg}`),
-  error: (msg, err) => console.error(`[ERROR] ${msg}`, err)
+	info: (msg) => console.log(`[INFO] ${msg}`),
+	warn: (msg) => console.log(`[WARN] ${msg}`),
+	error: (msg, err) => console.error(`[ERROR] ${msg}`, err),
 };
 
 const notifier = new FeishuNotifier({
-  webhookUrl: 'xxx',
-  logger: customLogger
+	webhookUrl: "xxx",
+	logger: customLogger,
 });
 ```
 
@@ -92,9 +92,9 @@ const notifier = new FeishuNotifier({
 
 ```javascript
 try {
-  await notifier.notify('测试消息');
+	await notifier.notify("测试消息");
 } catch (error) {
-  console.error('发送失败:', error);
+	console.error("发送失败:", error);
 }
 ```
 

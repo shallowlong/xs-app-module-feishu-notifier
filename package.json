@@ -1,5 +1,5 @@
 {
-	"name": "feishu-notifier",
+	"name": "xs.app.module.feishu-notifier",
 	"version": "1.0.0",
 	"description": "飞书消息通知模块，支持频率控制、消息队列和失败重试",
 	"type": "module",
@@ -18,7 +18,7 @@
 		"message",
 		"bot"
 	],
-	"author": "",
+	"author": "xishu2099 <shallowlong@gmail.com>",
 	"license": "MIT",
 	"dependencies": {
 		"axios": "^1.6.0",

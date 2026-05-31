@@ -1,0 +1,10 @@
+{
+	"trailingComma": "all",
+	"semi": true,
+	"singleQuote": false,
+	"bracketSpacing": true,
+	"objectWrap": "preserve",
+	"bracketSameLine": true,
+	"arrowParens": "always",
+	"vueIndentScriptAndStyle": true
+}
