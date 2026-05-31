@@ -31,7 +31,8 @@ git push
 ## 快速开始
 
 ```javascript
-import FeishuNotifier from "feishu-notifier";
+CommonJS: const FeishuNotifier = require('feishu-notifier');
+ESM: import FeishuNotifier from "feishu-notifier";
 
 // 创建通知器实例
 const notifier = new FeishuNotifier({
@@ -62,8 +63,11 @@ await notifier.warn("磁盘空间不足！");
 ## 完整示例
 
 ```javascript
-import FeishuNotifier from "feishu-notifier";
-import pino from "pino";
+CommonJS: const FeishuNotifier = require('feishu-notifier');
+ESM: import FeishuNotifier from "feishu-notifier";
+
+CommonJS: const pino = require('pino');
+ESM: import pino from "pino";
 
 const logger = pino();
 
@@ -94,7 +98,8 @@ await notifier.send("自定义警告", "warning");
 ### 自定义 Logger
 
 ```javascript
-import FeishuNotifier from "feishu-notifier";
+CommonJS: const FeishuNotifier = require('feishu-notifier');
+ESM: import FeishuNotifier from "feishu-notifier";
 
 const customLogger = {
 	info: (msg) => console.log(`[INFO] ${msg}`),

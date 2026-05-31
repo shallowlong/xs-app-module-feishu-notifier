@@ -1,17 +1,32 @@
 {
 	"name": "xs.app.module.feishu-notifier",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "飞书消息通知模块，支持频率控制、消息队列和失败重试",
 	"type": "module",
-	"main": "./src/index.js",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
 	"types": "./src/index.d.ts",
 	"exports": {
 		".": {
-			"import": "./src/index.js",
-			"types": "./src/index.d.ts"
+			"import": {
+				"types": "./src/index.d.ts",
+				"default": "./dist/index.mjs"
+			},
+			"require": {
+				"types": "./src/index.d.ts",
+				"default": "./dist/index.cjs"
+			}
 		}
 	},
+	"files": [
+		"dist/",
+		"src/index.d.ts",
+		"README.md",
+		"LICENSE"
+	],
 	"scripts": {
+		"build": "rollup -c",
+		"prepublishOnly": "npm run build",
 		"test": "node --test"
 	},
 	"keywords": [
@@ -30,5 +45,10 @@
 	},
 	"engines": {
 		"node": ">=18.0.0"
+	},
+	"devDependencies": {
+		"@rollup/plugin-commonjs": "^29.0.3",
+		"@rollup/plugin-node-resolve": "^16.0.3",
+		"rollup": "^4.60.4"
 	}
 }
