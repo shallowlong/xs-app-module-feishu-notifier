@@ -7,16 +7,28 @@ import dayjs from "dayjs";
  */
 class FeishuNotifier {
 	/**
+	 * 配置项的最大值限制
+	 */
+	static LIMITS = {
+		RATE_LIMIT_PER_SECOND_MAX: 5,
+		RATE_LIMIT_PER_MINUTE_MAX: 60,
+		MAX_QUEUE_SIZE_MAX: 200,
+		MAX_MESSAGE_SIZE_MAX: 20 * 1024 - 1, // 20KB
+		RETRY_INTERVAL_MIN: 1000,
+		RETRY_INTERVAL_MAX: 60000,
+	};
+
+	/**
 	 * 构造函数
 	 * @param {Object} options - 配置选项
 	 * @param {string} options.webhookUrl - 飞书 webhook 地址（必填）
 	 * @param {Object} [options.logger] - 日志实例，需实现 info/warn/error 方法
-	 * @param {number} [options.rateLimitPerSecond=2] - 每秒最大请求数
-	 * @param {number} [options.rateLimitPerMinute=50] - 每分钟最大请求数
-	 * @param {number} [options.maxQueueSize=100] - 消息队列最大长度
-	 * @param {number} [options.maxMessageSize=20479] - 单条消息最大字节数（默认 20KB-1）
-	 * @param {boolean} [options.skipPeakTime=false] - 是否跳过整点半点发送
-	 * @param {number} [options.retryInterval=5000] - 发送失败重试间隔（毫秒）
+	 * @param {number} [options.rateLimitPerSecond=2] - 每秒最大请求数（最大 5）
+	 * @param {number} [options.rateLimitPerMinute=50] - 每分钟最大请求数（最大 60）
+	 * @param {number} [options.maxQueueSize=100] - 消息队列最大长度（最大 200）
+	 * @param {number} [options.maxMessageSize=20479] - 单条消息最大字节数（最大 20KB）
+	 * @param {boolean} [options.skipPeakTime=1] - 是否跳过整点半点发送（1: 是, 0: 否）
+	 * @param {number} [options.retryInterval=5000] - 发送失败重试间隔，毫秒（1000-60000）
 	 * @param {string} [options.appName=''] - 应用名称，用于消息前缀
 	 */
 	constructor(options) {
@@ -29,23 +41,92 @@ class FeishuNotifier {
 		this.logger = options.logger || console;
 		this.appName = options.appName || "";
 
-		// 频率控制配置
-		this.rateLimitPerSecond = options.rateLimitPerSecond ?? 2;
-		this.rateLimitPerMinute = options.rateLimitPerMinute ?? 50;
+		// 频率控制配置（带最大值限制）
+		this.rateLimitPerSecond = this._clamp(
+			options.rateLimitPerSecond,
+			1,
+			FeishuNotifier.LIMITS.RATE_LIMIT_PER_SECOND_MAX,
+			"rateLimitPerSecond",
+		);
+		this.rateLimitPerMinute = this._clamp(
+			options.rateLimitPerMinute,
+			1,
+			FeishuNotifier.LIMITS.RATE_LIMIT_PER_MINUTE_MAX,
+			"rateLimitPerMinute",
+		);
 
-		// 队列配置
-		this.maxQueueSize = options.maxQueueSize ?? 100;
-		this.maxMessageSize = options.maxMessageSize ?? 20 * 1024 - 1;
+		// 队列配置（带最大值限制）
+		this.maxQueueSize = this._clamp(
+			options.maxQueueSize,
+			1,
+			FeishuNotifier.LIMITS.MAX_QUEUE_SIZE_MAX,
+			"maxQueueSize",
+		);
+		this.maxMessageSize = this._clamp(
+			options.maxMessageSize,
+			1024,
+			FeishuNotifier.LIMITS.MAX_MESSAGE_SIZE_MAX,
+			"maxMessageSize",
+		);
 
 		// 发送策略
-		this.skipPeakTime = options.skipPeakTime ?? false;
-		this.retryInterval = options.retryInterval ?? 5000;
+		this.skipPeakTime = options.skipPeakTime === 1;
+		this.retryInterval = this._clamp(
+			options.retryInterval,
+			FeishuNotifier.LIMITS.RETRY_INTERVAL_MIN,
+			FeishuNotifier.LIMITS.RETRY_INTERVAL_MAX,
+			"retryInterval",
+		);
 
 		// 内部状态
 		this.messageQueue = [];
 		this.isSending = false;
 		this.processTimeoutRef = null;
 		this.requestTimestamps = [];
+
+		// 记录最终配置
+		this.logger.info("[FeishuNotifier] 初始化完成，配置:", {
+			webhookUrl: this.webhookUrl ? "已配置" : "未配置",
+			rateLimitPerSecond: this.rateLimitPerSecond,
+			rateLimitPerMinute: this.rateLimitPerMinute,
+			maxQueueSize: this.maxQueueSize,
+			maxMessageSize: this.maxMessageSize,
+			skipPeakTime: this.skipPeakTime,
+			retryInterval: this.retryInterval,
+			appName: this.appName,
+		});
+	}
+
+	/**
+	 * 将数值限制在指定范围内
+	 * @private
+	 * @param {number} value - 输入值
+	 * @param {number} min - 最小值
+	 * @param {number} max - 最大值
+	 * @param {string} name - 配置项名称（用于日志）
+	 * @returns {number} 限制后的值
+	 */
+	_clamp(value, min, max, name) {
+		const num = Number(value);
+		if (Number.isNaN(num)) {
+			this.logger.warn(
+				`[FeishuNotifier] ${name} 配置无效，使用默认值 ${min}`,
+			);
+			return min;
+		}
+		if (num < min) {
+			this.logger.warn(
+				`[FeishuNotifier] ${name} (${num}) 小于最小值 ${min}，已调整为 ${min}`,
+			);
+			return min;
+		}
+		if (num > max) {
+			this.logger.warn(
+				`[FeishuNotifier] ${name} (${num}) 超过最大值 ${max}，已调整为 ${max}`,
+			);
+			return max;
+		}
+		return num;
 	}
 
 	/**
@@ -222,7 +303,7 @@ class FeishuNotifier {
 			headers: {
 				"Content-Type": "application/json",
 			},
-			timeout: 10000, // 10秒超时
+			timeout: 30000, // 30秒超时
 		});
 	}
 

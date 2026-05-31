@@ -2,10 +2,20 @@
 
 飞书消息通知模块，支持频率控制、消息队列和失败重试。
 
-## 安装
+## 安装(submodule)
 
 ```bash
-npm install feishu-notifier
+git submodule add git@github.com:shallowlong/xs-app-module-feishu-notifier.git path/to/feishu-notifier
+```
+
+修改 package.json
+
+```json
+{
+	"dependencies": {
+		"feishu-notifier": "file:./path/to/feishu-notifier"
+	}
+}
 ```
 
 ## 快速开始
@@ -36,7 +46,7 @@ await notifier.warn("磁盘空间不足！");
 | `rateLimitPerMinute` | number  | 否   | `50`      | 每分钟最大请求数                            |
 | `maxQueueSize`       | number  | 否   | `100`     | 消息队列最大长度                            |
 | `maxMessageSize`     | number  | 否   | `20479`   | 单条消息最大字节数（20KB-1）                |
-| `skipPeakTime`       | boolean | 否   | `false`   | 是否跳过整点半点发送                        |
+| `skipPeakTime`       | boolean | 否   | `1`       | 是否跳过整点半点发送                        |
 | `retryInterval`      | number  | 否   | `5000`    | 发送失败重试间隔（毫秒）                    |
 
 ## 完整示例
@@ -54,7 +64,7 @@ const notifier = new FeishuNotifier({
 	rateLimitPerSecond: 2,
 	rateLimitPerMinute: 50,
 	maxQueueSize: 100,
-	skipPeakTime: true,
+	skipPeakTime: 1,
 	retryInterval: 5000,
 });
 
