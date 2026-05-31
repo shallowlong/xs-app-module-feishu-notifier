@@ -18,6 +18,16 @@ git submodule add git@github.com:shallowlong/xs-app-module-feishu-notifier.git p
 }
 ```
 
+## 更新
+
+```bash
+git submodule update --remote
+
+git add .
+git commit -m "chore: update feishu-notifier submodule"
+git push
+```
+
 ## 快速开始
 
 ```javascript
