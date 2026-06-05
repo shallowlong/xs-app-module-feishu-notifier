@@ -13,7 +13,7 @@ git submodule add git@github.com:shallowlong/xs-app-module-feishu-notifier.git p
 ```json
 {
 	"dependencies": {
-		"feishu-notifier": "file:./path/to/feishu-notifier"
+		"xs-feishu-notifier": "file:./path/to/feishu-notifier"
 	}
 }
 ```
@@ -31,8 +31,8 @@ git push
 ## 快速开始
 
 ```javascript
-CommonJS: const FeishuNotifier = require('feishu-notifier');
-ESM: import FeishuNotifier from "feishu-notifier";
+CommonJS: const FeishuNotifier = require('xs-feishu-notifier');
+ESM: import FeishuNotifier from "xs-feishu-notifier";
 
 // 创建通知器实例
 const notifier = new FeishuNotifier({
@@ -63,8 +63,8 @@ await notifier.warn("磁盘空间不足！");
 ## 完整示例
 
 ```javascript
-CommonJS: const FeishuNotifier = require('feishu-notifier');
-ESM: import FeishuNotifier from "feishu-notifier";
+CommonJS: const FeishuNotifier = require('xs-feishu-notifier');
+ESM: import FeishuNotifier from "xs-feishu-notifier";
 
 CommonJS: const pino = require('pino');
 ESM: import pino from "pino";
@@ -98,8 +98,8 @@ await notifier.send("自定义警告", "warning");
 ### 自定义 Logger
 
 ```javascript
-CommonJS: const FeishuNotifier = require('feishu-notifier');
-ESM: import FeishuNotifier from "feishu-notifier";
+CommonJS: const FeishuNotifier = require('xs-feishu-notifier');
+ESM: import FeishuNotifier from "xs-feishu-notifier";
 
 const customLogger = {
 	info: (msg) => console.log(`[INFO] ${msg}`),
