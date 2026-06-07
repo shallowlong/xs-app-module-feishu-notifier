@@ -14,8 +14,11 @@ class FeishuNotifier {
 	 * 配置项的最大值限制
 	 */
 	static LIMITS = {
+		RATE_LIMIT_PER_SECOND_DEFAULT: 2,
 		RATE_LIMIT_PER_SECOND_MAX: 5,
+		RATE_LIMIT_PER_MINUTE_DEFAULT: 30,
 		RATE_LIMIT_PER_MINUTE_MAX: 60,
+		MAX_QUEUE_SIZE_DEFAULT: 100,
 		MAX_QUEUE_SIZE_MAX: 200,
 		MAX_MESSAGE_SIZE_MAX: 20 * 1024 - 1, // 20KB
 		RETRY_INTERVAL_MIN: 1000,
@@ -30,7 +33,6 @@ class FeishuNotifier {
 	 * @param {number} [options.rateLimitPerSecond=2] - 每秒最大请求数（最大 5）
 	 * @param {number} [options.rateLimitPerMinute=50] - 每分钟最大请求数（最大 60）
 	 * @param {number} [options.maxQueueSize=100] - 消息队列最大长度（最大 200）
-	 * @param {number} [options.maxMessageSize=20479] - 单条消息最大字节数（最大 20KB）
 	 * @param {boolean} [options.skipPeakTime=1] - 是否跳过整点半点发送（1: 是, 0: 否）
 	 * @param {number} [options.retryInterval=5000] - 发送失败重试间隔，毫秒（1000-60000）
 	 * @param {string} [options.appName=''] - 应用名称，用于消息前缀
@@ -48,13 +50,13 @@ class FeishuNotifier {
 		// 频率控制配置（带最大值限制）
 		this.rateLimitPerSecond = this._clamp(
 			options.rateLimitPerSecond,
-			1,
+			FeishuNotifier.LIMITS.RATE_LIMIT_PER_SECOND_DEFAULT,
 			FeishuNotifier.LIMITS.RATE_LIMIT_PER_SECOND_MAX,
 			"rateLimitPerSecond",
 		);
 		this.rateLimitPerMinute = this._clamp(
 			options.rateLimitPerMinute,
-			1,
+			FeishuNotifier.LIMITS.RATE_LIMIT_PER_MINUTE_DEFAULT,
 			FeishuNotifier.LIMITS.RATE_LIMIT_PER_MINUTE_MAX,
 			"rateLimitPerMinute",
 		);
@@ -62,16 +64,11 @@ class FeishuNotifier {
 		// 队列配置（带最大值限制）
 		this.maxQueueSize = this._clamp(
 			options.maxQueueSize,
-			1,
+			FeishuNotifier.LIMITS.MAX_QUEUE_SIZE_DEFAULT,
 			FeishuNotifier.LIMITS.MAX_QUEUE_SIZE_MAX,
 			"maxQueueSize",
 		);
-		this.maxMessageSize = this._clamp(
-			options.maxMessageSize,
-			1024,
-			FeishuNotifier.LIMITS.MAX_MESSAGE_SIZE_MAX,
-			"maxMessageSize",
-		);
+		this.maxMessageSize = FeishuNotifier.LIMITS.MAX_MESSAGE_SIZE_MAX;
 
 		// 发送策略
 		this.skipPeakTime = options.skipPeakTime === 1;

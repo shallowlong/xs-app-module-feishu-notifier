@@ -1,6 +1,6 @@
 {
 	"name": "xs-feishu-notifier",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "飞书消息通知模块，支持频率控制、消息队列和失败重试",
 	"type": "module",
 	"main": "./dist/index.cjs",

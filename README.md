@@ -18,6 +18,12 @@ git submodule add git@github.com:shallowlong/xs-app-module-feishu-notifier.git p
 }
 ```
 
+submodule 额外依赖安装
+
+```bash
+npm install axios dayjs --save
+```
+
 ## 更新
 
 ```bash
